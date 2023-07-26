@@ -20,7 +20,7 @@ pkg install ./opnsense-dynv6-updater.txz
     - Minutes: e.g. `*/5` to run every 5 minutes.
     - Hours / Day of the month / Months / Days of the week: `*`
     - Command: Update dynv6 Dynamic DNS
-    - Parameters: `<zone> <password>`, where you can obtain your password in the "Instructions" tab of dynv6.
+    - Parameters: `<zone> <password> <ipv4-interface> <ipv6-interface>`, where you can obtain your password in the "Instructions" tab of dynv6.
     - Description: Update Dynamic DNS
 
 ## How to build

@@ -4,7 +4,7 @@ set -Eeuo pipefail
 usage()
 {
     cat <<EOF >&2
-Usage: $0 domain token [OPTIONS]
+Usage: $0 domain token ipv4-interface ipv6-interface [OPTIONS]
 
 Update DNS records of dynv6.
 
@@ -32,20 +32,28 @@ while [[ $# -gt 0 ]]; do
 done
 set -- "${positional[@]}"
 
-if [[ $# -ne 2 ]]; then
-    echo "Expected 2 positional arguments, but got $#."
+if [[ $# -ne 4 ]]; then
+    echo "Expected 4 positional arguments, but got $#."
     echo "Try '$0 --help' for more information."
     exit 1
 fi
 
 DOMAIN="$1"
 TOKEN="$2"
+IPV4_INTERFACE="$3"
+IPV6_INTERFACE="$4"
 
-CURRENT_IP4="$(dig -4 +short A myip.opendns.com @resolver1.opendns.com)"
-CURRENT_IP6="$(dig -6 +short AAAA myip.opendns.com @resolver1.opendns.com)"
+CURRENT_IP4="$(ifconfig $IPV4_INTERFACE | grep '\<inet\>' | cut -d' ' -f2)"
+CURRENT_IP6="$(ifconfig $IPV6_INTERFACE | grep '\<inet6\> [23]' | cut -d' ' -f2)"
 
-DNS_IP4="$(dig +short A $DOMAIN)"
-DNS_IP6="$(dig +short AAAA $DOMAIN)"
+IP4_FILE="$HOME/.opnsense.dynv6.updater.last.ip4"
+IP6_FILE="$HOME/.opnsense.dynv6.updater.last.ip6"
 
-[[ "$CURRENT_IP4" != "$DNS_IP4" ]] && curl -fsS "https://ipv4.dynv6.com/api/update?zone=$DOMAIN&token=$TOKEN&ipv4=auto"
-[[ "$CURRENT_IP6" != "$DNS_IP6" ]] && curl -fsS "https://ipv6.dynv6.com/api/update?zone=$DOMAIN&token=$TOKEN&ipv6prefix=auto&ipv6=auto"
+LAST_IP4=""
+LAST_IP6=""
+
+[[ -f "$IP4_FILE" ]] && LAST_IP4="$(cat "$IP4_FILE")"
+[[ -f "$IP6_FILE" ]] && LAST_IP6="$(cat "$IP6_FILE")"
+
+[[ "$CURRENT_IP4" != "$LAST_IP4" ]] && curl -fsS "https://ipv4.dynv6.com/api/update?zone=$DOMAIN&token=$TOKEN&ipv4=$CURRENT_IP4" && echo $CURRENT_IP4 >"$IP4_FILE"
+[[ "$CURRENT_IP6" != "$LAST_IP6" ]] && curl -fsS "https://ipv6.dynv6.com/api/update?zone=$DOMAIN&token=$TOKEN&ipv6=$CURRENT_IP6/64" && echo $CURRENT_IP6 >"$IP6_FILE"
