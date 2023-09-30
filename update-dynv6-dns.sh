@@ -46,8 +46,8 @@ IPV6_INTERFACE="$4"
 CURRENT_IP4="$(ifconfig $IPV4_INTERFACE | grep '\<inet\>' | cut -d' ' -f2)"
 CURRENT_IP6="$(ifconfig $IPV6_INTERFACE | grep '\<inet6\> [23]' | cut -d' ' -f2)"
 
-IP4_FILE="$HOME/.opnsense.dynv6.updater.last.ip4"
-IP6_FILE="$HOME/.opnsense.dynv6.updater.last.ip6"
+IP4_FILE="/.opnsense.dynv6.updater.last.ip4"
+IP6_FILE="/.opnsense.dynv6.updater.last.ip6"
 
 LAST_IP4=""
 LAST_IP6=""

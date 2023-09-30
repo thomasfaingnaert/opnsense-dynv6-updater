@@ -3,8 +3,9 @@ all:
 		-p opnsense-dynv6-updater.txz \
 		-f \
 		--name opnsense-dynv6-updater \
+		--depends bash \
 		--license BSD3 \
-		--version 1.1.0 \
+		--version 1.2.0 \
 		--architecture all \
 		--after-install=after-install.sh \
 		--description "OPNsense Dynamic DNS updater for dynv6" \
